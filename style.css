@@ -109,7 +109,7 @@ a:nth-of-type(1) {
     /* animation-iteration-count: 3; */
     /* leuke property */
     &.cold{
-      animation-duration: .1s;
+      animation-duration: .15s;
     }
     &.frozen{
       background: var(--highlight-primary);
@@ -248,4 +248,10 @@ a:nth-of-type(12) {
   }
 }
 
+a:nth-of-type(n+6):nth-of-type(-n+11), a:nth-of-type(n+13){
+  background: rgb(88, 88, 88);
+  color: #050840;
+  border-color: #050840;
+  cursor: not-allowed;
+}
 /* Hieronder komen jouw animaties */

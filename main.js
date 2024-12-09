@@ -1,6 +1,7 @@
 const heading = document.querySelector("h1");
 const allButtons = document.querySelectorAll("a");
 const glow = document.querySelector(".glow");
+// added multiple in case I want to add more...
 const animations = [
   { name: "bibber", event: "mouseenter" },
   { name: "stepper", event: "click" },
