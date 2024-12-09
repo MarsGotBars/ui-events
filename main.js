@@ -1,57 +1,132 @@
-/*
-   De eerste interactie is al voor jullie uitgewerkt
-   Als je op het 12e linkje klikt (“Interaction”), springt deze omhoog
-*/
-
-// Stap 1: selecteer het 12e linkje, en sla deze op in een variabele
-const parent = document.querySelector('section')
-const number = parent.childElementCount
+const heading = document.querySelector("h1");
 const allButtons = document.querySelectorAll("a");
+const glow = document.querySelector(".glow");
+const animations = [
+  { name: "bibber", event: "mouseenter" },
+  { name: "stepper", event: "click" },
+  { name: "sadness", event: "mouseleave" },
+  { name: "glowow", event: "mouseover" },
+  { name: "toggle", event: "mouseleave" },
+  { name: "wtfhello", event: "mouseleave" },
+  { name: "joe", event: "mouseover" },
+  { name: "joe", event: "click" },
+  { name: "joe", event: "mouseleave" },
+  { name: "joe", event: "mouseover" },
+  { name: "joe", event: "click" },
+  { name: "jump", event: "mouseenter" },
+];
 
-// Stap 2: voeg de (click) event listener toe aan de link, met een callback functie
+let iterationCount = 0;
 
-// Deze jumpHandler functie staat klaar voor als we 'm aanroepen; deze wordt dus
-// _niet_ meteen bij het laden van de pagina aangeroepen
-const animationNames = ["bibber", "stepper", "sadness", "glowow", "joe", "joe", "joe", "joe", "joe", "joe", "joe", "jump"];
+let sprintBool = true;
 
-// In dit geval wordt de jumpHandler functie aangeroepen, zodra je op het linkje klikt
+let mouseX = 0,
+  mouseY = 0;
+let isTracking = false;
+let trackingElement = null;
+
+function trackMouse() {
+  if (trackingElement) {
+    // Trying out setProperty to change the pos
+    document.documentElement.style.setProperty("--mouseX", `${mouseX}px`);
+    document.documentElement.style.setProperty("--mouseY", `${mouseY}px`);
+  }
+
+  if (isTracking) {
+    // 60fps tracking with requestAnimationFrame
+    requestAnimationFrame(trackMouse);
+  }
+}
+
 allButtons.forEach((button, i) => {
-  const eventType = i % 3 === 0 
-    ? "mouseover"
-    : i % 3 === 1
-    ? "click"
-    : "mouseleave";
-  button.addEventListener(eventType, () => {
-    button.classList.toggle(animationNames[i]);
-    console.log(`Triggered ${eventType} for button ${i}`);
-  })
-  button.addEventListener('animationiteration', () => {
+  // Skip the loop if there are more buttons than animations
+  if (i >= animations.length) return;
+  // destructuring object for use in functions and such
+  const { name, event } = animations[i];
 
-  })
-  // Extraatje, waardoor de class weer weggehaald wordt zodra de animatie afgelopen is
+  // Handle "mouseover" separately for tracking mouse position with RAF
+  if (event === "mouseover" && name === "glowow") {
+    button.addEventListener("mouseover", () => {
+      trackingElement = button; // Start tracking this button
+      button.classList.add(name); // Add animation class to button
+
+      if (!isTracking) {
+        isTracking = true;
+        requestAnimationFrame(trackMouse); // Start the RAF loop
+      }
+    });
+
+    button.addEventListener("mousemove", (e) => {
+      const rect = button.getBoundingClientRect(); // Get element's position relative to the viewport
+      mouseX = e.clientX - rect.left; // Subtract the element's left offset to get mouseX relative to the element
+      mouseY = e.clientY - rect.top; // Subtract the element's top offset to get mouseY relative to the element
+    });
+
+    button.addEventListener("mouseleave", () => {
+      trackingElement = null; // Stop tracking
+      button.classList.remove(name); // Remove animation class
+      isTracking = false; // Stop RAF loop
+    });
+  } else {
+    // Handle other events the normal way
+    button.addEventListener(event, () => {
+      button.classList.toggle(name);
+      console.log(`Triggered ${event} for button ${i}`);
+      button.addEventListener('animationiteration', (e)=> {
+        const targetCount = 5;
+        iterationCount++
+        console.log(e);
+        
+        if(iterationCount >= targetCount){
+          console.log('hey');
+          
+          button.classList.add('cold')
+        }
+        if(iterationCount >= targetCount * 5){
+          button.classList.remove('cold')
+          button.classList.add('frozen')
+        }
+        
+      })
+      // Specifically for element 4 (5 - 1)
+      if (i === 4) {
+        if (sprintBool === true) {
+          button.innerText = "come back!";
+        } else button.innerText = "😎";
+        console.log(sprintBool);
+        sprintBool = !sprintBool;
+      }
+    });
+  }
+
   button.addEventListener("animationend", () => {
-    button.classList.remove(animationNames[i]);
-  })
-  // console.log(button);
-})
-// interaction12.addEventListener('click', jumpHandler)
-let i = allButtons.length - 1
+    button.classList.remove(name); // Clean up animation class after animation ends
+  });
+});
+
+// Handling Backspace key press to remove elements
+let i = allButtons.length - 1;
 document.addEventListener("keydown", (e) => {
-if(e.key === "Backspace") allButtons[i].remove();
-console.log(allButtons[i]);
-console.log(number);
+  if (e.key === "Backspace") {
+    // Iterate backwards through non-hidden buttons
+    for (let j = i; j >= 0; j--) {
+      if (!allButtons[j].classList.contains("hidden")) {
+        allButtons[j].classList.add("hidden");
+        setTimeout(() => {
+          allButtons[j].remove();
+          const updatedAllButtons = document.querySelectorAll("a");
+          console.log(updatedAllButtons.length); // Log updated buttons length
 
-
-  
-})
-// Ga zelf verder met de overige elementen, aan de hand van de instructies
-// Maak bijvoorbeeld een bibber animatie als je op iets klikt
-
-// Stap 1: querySelector
-// let bibberLink = document.querySelector...
-
-// Stap 2: addEventListener
-// bibberLink.addEventListener...
-
-// Stap 3: (Callback functie met) classList (.toggle(), .add(), etc.)
-// bibberLink.classList.toggle...
+          if (updatedAllButtons.length === 0) {
+            heading.classList.add("freedom"); // Apply "freedom" class if no buttons left
+            console.log("All buttons removed, heading updated.");
+          }
+        }, 300);
+        i = j;
+        break;
+      }
+    }
+    console.log(allButtons[i]); // Log the last button
+    console.log(allButtons.length); // Log the total number of buttons
+  }
+});

@@ -7,10 +7,13 @@
   --radius: 0.5rem;
   --pill: 2rem;
   --line: 0.1rem;
+  --mouseX: 0;
+  --mouseY: 0;
 }
 * {
   box-sizing: border-box;
 }
+
 body {
   margin: 2rem;
   padding: 0;
@@ -24,9 +27,22 @@ section {
   display: flex;
   flex-wrap: wrap;
 }
+h1 {
+  transition: 0.5s ease-out;
+  top: 0;
+  position: absolute;
+  width: auto;
+  transform: translateX(-200%);
+  color: var(--highlight-primary);
+  &.freedom {
+    transform: translateX(0);
+  }
+}
 a {
-  display: block;
+  display: grid;
+  place-content: center;
   margin: 0.2em;
+  position: relative;
   padding: 0.4em 0.8em;
   background: var(--secondary);
   color: var(--highlight-primary);
@@ -35,6 +51,9 @@ a {
   font-weight: normal;
   transition-delay: 0.3s;
   text-decoration: none;
+  overflow-x: hidden;
+  width: auto;
+
   &:hover {
     color: var(--primary);
     border-color: var(--primary);
@@ -43,13 +62,60 @@ a {
   &:focus {
     outline: thick dashed var(--primary);
   }
+  &.hidden {
+    animation: hiding 0.5s ease forwards;
+  }
+  > .glow {
+    position: absolute;
+    aspect-ratio: 1;
+    width: 0;
+    background: var(--highlight-secondary);
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(calc(var(--mouseX) - 50%), calc(var(--mouseY) - 50%));
+    transition: height .5s, width .5s, transform 0s, opacity .5s;
+    z-index: 1;
+  }
+  &.glowow {
+    span{
+      z-index: 10;
+    }
+    > .glow {
+      width: 200%;
+      aspect-ratio: 1;
+      opacity: 1;
+    }
+  }
+}
+
+@keyframes hiding {
+  to {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.toggle{
+  /* sorry had nie zoveel zin om nog eens gebruik te maken van mouseover -> mouseleave :) */
+  &:hover{
+    background: var(--highlight-secondary);
+  }
 }
 /* btn 1 */
 a:nth-of-type(1) {
   &.bibber {
-    animation: bibber 0.3s ease;
+    animation: bibber 0.3s ease infinite;
+    transition: background 1s, color 1s;
     /* animation-iteration-count: 3; */
     /* leuke property */
+    &.cold{
+      animation-duration: .1s;
+    }
+    &.frozen{
+      background: var(--highlight-primary);
+      animation: forwards;
+      color: #050840;
+    }
   }
 }
 @keyframes bibber {
@@ -93,12 +159,12 @@ a:nth-of-type(2) {
 a:nth-of-type(3) {
   position: relative;
   overflow: hidden;
-  &::after{
+  &::after {
     content: "";
     position: absolute;
     display: grid;
     place-items: center;
-    text-orientation:upright;
+    text-orientation: upright;
     top: 0;
     left: 0;
     width: 100%;
@@ -106,8 +172,8 @@ a:nth-of-type(3) {
     background: transparent;
     transition: 0s;
   }
-  &.sadness{
-    &:after{
+  &.sadness {
+    &:after {
       content: ":(";
       background: var(--secondary);
       animation: SAD 2s ease;
@@ -115,7 +181,7 @@ a:nth-of-type(3) {
   }
 }
 @keyframes SAD {
-  to{
+  to {
     opacity: 0;
   }
 }
@@ -128,14 +194,14 @@ a:nth-of-type(4) {
     background: red;
     content: "";
     position: absolute;
-    top: -.05em;
+    top: -0.05em;
     left: 0.8em;
     width: calc(100% - 1.6em);
     height: var(--line);
-    transition: .5s ease;
+    transition: 0.5s ease;
   }
-  &:hover{
-    &::after{
+  &:hover {
+    &::after {
       transform: translateX(100%);
     }
   }
